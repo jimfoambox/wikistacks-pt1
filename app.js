@@ -1,20 +1,27 @@
 const express = require('express')
 const app = express();
-const routes = require('./routes/routes')
+const wikiRoutes = require('./routes/wiki');
+//const usersRoutes = require('./routes/users');
 const morgan = require('morgan')
-const { db } = require('./models');
+const { db, Page, User } = require('./models');
 
 app.use(morgan('tiny'))
 app.use(express.static(__dirname +'public'));
 app.use(express.urlencoded({extended: false}));
-app.use('/', routes);
+app.use('/wiki', wikiRoutes);
 
 const PORT = 3000;
 
-app.listen(PORT, () => {
-  console.log(`App listening in port ${PORT}`);
-});
+const init = async() => {
+  await Page.sync();
+  await User.sync();
 
+  app.listen(PORT, () => {
+    console.log(`App listening in port ${PORT}`);
+  });
+}
+
+init();
 // db.authenticate()
 //   .then(() => {
 //     console.log('connected to the database');
